@@ -1,0 +1,32 @@
+name: Run Event Scrapers
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # Runs everyday at 06:00 UTC
+  workflow_dispatch: # Allows you to manually click "Run" in GitHub
+
+jobs:
+  scrape-and-sync:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run Scraper Script
+      env:
+        GOOGLE_SERVICE_ACCOUNT_EMAIL: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_EMAIL }}
+        GOOGLE_PRIVATE_KEY: ${{ secrets.GOOGLE_PRIVATE_KEY }}
+        GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+        RENDER_BACKEND_URL: ${{ secrets.RENDER_BACKEND_URL }}
+        SCRAPER_API_KEY: ${{ secrets.SCRAPER_API_KEY }}
+      run: node index.js
